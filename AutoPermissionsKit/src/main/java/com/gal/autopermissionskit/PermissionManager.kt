@@ -45,7 +45,7 @@ class PermissionHandler(
     private val permission: String,
     private val rationaleMessage: String = "נדרשת הרשאה להפעלת הפיצ'ר הזה.",
     private val onGranted: () -> Unit,
-    private val onDenied: (message: String) -> Unit
+    private val onDenied: ((message: String) -> Unit)? = null
 ) {
 
     private var launcher: ActivityResultLauncher<String>? = null
@@ -69,11 +69,12 @@ class PermissionHandler(
                     val shouldShowRationale = activity.shouldShowRequestPermissionRationale(permission)
                     if (!shouldShowRationale) {
                         // Permission was denied permanently (Don't ask again)
-                        onDenied("ההרשאה נדחתה לצמיתות. נא לאשר אותה דרך הגדרות.")
-                        showSettingsRedirectDialog(permission)
+                        val msg = "ההרשאה נדחתה לצמיתות. נא לאשר אותה דרך הגדרות."
+                        onDenied?.invoke(msg) ?: showDefaultDialog(msg)
+                        showSettingsRedirectDialog()
                     } else {
                         // Permission denied temporarily – show rationale message
-                        onDenied(rationaleMessage)
+                        onDenied?.invoke(rationaleMessage) ?: showDefaultDialog(rationaleMessage)
                     }
                 }
             }
@@ -95,10 +96,22 @@ class PermissionHandler(
     }
 
     /**
+     * Shows a default dialog with a message.
+     * This is used when the user denies the permission but can still be prompted again.
+     */
+    private fun showDefaultDialog(message: String) {
+        MaterialAlertDialogBuilder(activity)
+            .setTitle("שימו לב")
+            .setMessage(message)
+            .setPositiveButton("סגור", null)
+            .show()
+    }
+
+    /**
      * Shows a dialog that redirects the user to the app's settings screen,
      * typically used when the permission is permanently denied.
      */
-    private fun showSettingsRedirectDialog(permission: String) {
+    private fun showSettingsRedirectDialog() {
         MaterialAlertDialogBuilder(activity)
             .setTitle("הרשאה חסומה")
             .setMessage("יש לאפשר את ההרשאה דרך ההגדרות כדי להמשיך.")
@@ -108,7 +121,6 @@ class PermissionHandler(
             .setNegativeButton("ביטול", null)
             .show()
     }
-
     /**
      * Opens the application details settings page so the user can manually grant permissions.
      */
@@ -122,5 +134,27 @@ class PermissionHandler(
                 null)
         }
         activity.startActivity(intent)
+    }
+
+    companion object{
+        /**
+         * Convenience method to create a PermissionHandler with a default rationale message.
+         */
+        fun withDefaultRationale(
+            activity: ComponentActivity,
+            permission: String,
+            rationaleMessage: String = "נדרשת הרשאה להפעלת הפיצ'ר הזה.",
+            onGranted: () -> Unit,
+        ): PermissionHandler {
+            return PermissionHandler(
+                activity = activity,
+                permission = permission,
+                rationaleMessage = rationaleMessage,
+                onGranted = onGranted,
+                onDenied = null
+            ).apply {
+                checkAndRequest()
+            }
+        }
     }
 }
