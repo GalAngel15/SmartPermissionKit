@@ -9,8 +9,9 @@ A modern Android library for effortless runtime permission handling using the Ac
 
 ## ✨ Features
 
-* ✅ Simple one-line permission requests
-* ✅ Automatic rationale and settings redirect
+* ✅ Simple one-line permission requests with default UI
+* ✅ Optional `onDenied` handler – use yours or built-in dialogs
+* ✅ Automatic rationale handling and settings redirection
 * ✅ Fully generic – works with any Android permission
 * ✅ Based on Jetpack's Activity Result API
 
@@ -31,6 +32,18 @@ implementation project(":smartpermissionkit")
 ## 🚀 Usage
 
 ```kotlin
+// Minimal usage with built-in denial dialog
+PermissionHandler.withDefaultRationale(
+    activity = this,
+    permission = Manifest.permission.CAMERA,
+    rationaleMessage = "Camera access is needed to scan QR codes.",
+    onGranted = {
+        startCamera()
+    }
+)
+```
+```kotlin
+// Full customization with your own denial handler
 val permissionHandler = PermissionHandler(
     activity = this,
     permission = Manifest.permission.CAMERA,
@@ -62,8 +75,11 @@ Manifest.permission.READ_EXTERNAL_STORAGE
 
 ## 📂 Structure
 
-* `PermissionHandler.kt` – Core class handling all permission request logic
-* Supports rationale UI and permanent denial flow (redirects to settings)
+* `PermissionHandler.kt` – Core class for permission request flow
+  - Optional `onDenied` callback
+  - Built-in rationale message and fallback dialogs
+  - Redirects to app settings if permission is permanently denied
+  - Includes shortcut `withDefaultRationale(...)` for one-liner usage
 
 ---
 
