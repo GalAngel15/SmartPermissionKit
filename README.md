@@ -2,7 +2,8 @@
 
 A modern Android library for effortless runtime permission handling using the Activity Result API.
 
-![License](https://img.shields.io/github/license/GalAngel15/SmartPermissionKit)
+[![](https://jitpack.io/v/GalAngel15/SmartPermissionKit.svg)](https://jitpack.io/#GalAngel15/SmartPermissionKit)
+
 ![Platform](https://img.shields.io/badge/platform-Android-blue)
 
 ---
@@ -19,15 +20,31 @@ A modern Android library for effortless runtime permission handling using the Ac
 
 ## 📦 Installation
 
-Clone the repository and add the module manually to your project:
+Add JitPack to your `settings.gradle.kts` (or `project-level build.gradle` if you're not using Kotlin DSL):
 
-```groovy
-implementation project(":smartpermissionkit")
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        maven("https://jitpack.io")
+        google()
+        mavenCentral()
+    }
+}
+````
+
+Then, add the library to your app/module `build.gradle.kts` dependencies:
+
+```kotlin
+dependencies {
+    implementation("com.github.GalAngel15:SmartPermissionKit:1.0.0")
+}
 ```
 
-> Gradle/Maven publishing coming soon.
+> Replace `1.0.0` with the latest version if needed.
+> See the badge above or visit [JitPack](https://jitpack.io/#GalAngel15/SmartPermissionKit) for updates.
 
 ---
+
 
 ## 🚀 Usage
 
@@ -57,18 +74,6 @@ val permissionHandler = PermissionHandler(
 )
 
 permissionHandler.checkAndRequest()
-```
-
----
-
-## ⚙️ Customize
-
-Use with any Android permission:
-
-```kotlin
-Manifest.permission.ACCESS_FINE_LOCATION
-Manifest.permission.RECORD_AUDIO
-Manifest.permission.READ_EXTERNAL_STORAGE
 ```
 
 ---
